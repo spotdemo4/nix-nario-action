@@ -6,7 +6,7 @@ chiefly for [nix-init](https://github.com/spotdemo4/nix-init)
 
 ## Requirements
 
-[determinate-nix-action](https://github.com/DeterminateSystems/determinate-nix-action) or some other way of getting `nix nario`
+[DeterminateSystems/determinate-nix-action](https://github.com/DeterminateSystems/determinate-nix-action) or some other way of getting `nix nario`
 
 ## Usage
 
