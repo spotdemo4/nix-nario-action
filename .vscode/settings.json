@@ -1,0 +1,9 @@
+{
+  "editor.formatOnSave": true,
+  "files.associations": {
+    "renovate.json": "jsonc"
+  },
+
+  // actions
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
