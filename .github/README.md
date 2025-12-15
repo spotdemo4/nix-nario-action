@@ -13,7 +13,7 @@ chiefly for [`spotdemo4/nix-init`](https://github.com/spotdemo4/nix-init)
 ## Usage
 
 ```yaml
-- uses: spotdemo4/nix-nario-action/restore@v0.1.0
+- uses: spotdemo4/nix-nario-action/restore@v0.2.0
   id: attic-cache
   with:
     name: attic
@@ -22,7 +22,7 @@ chiefly for [`spotdemo4/nix-init`](https://github.com/spotdemo4/nix-init)
 # ...
 
 - if: ${{ steps.attic-cache.outputs.cache-hit != 'true' }}
-  uses: spotdemo4/nix-nario-action/save@v0.1.0
+  uses: spotdemo4/nix-nario-action/save@v0.2.0
   with:
     name: attic
     path: nixpkgs#attic-client
