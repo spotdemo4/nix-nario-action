@@ -1,7 +1,11 @@
+name: nix nario restore
+description: Restore the nix store to the actions cache using nix nario
+
 inputs:
   name:
     description: "name of the cache"
     required: true
+
   path:
     description: "nix path to save to the cache"
     required: false

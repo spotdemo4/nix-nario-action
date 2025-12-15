@@ -23,6 +23,7 @@ jobs:
       - name: Validate actions
         uses: jazzsequence/github-action-validator@8dce06e551e2b2a09f6e8c72e76fa4b60da5c8f1 # v1.0.1
         with:
+          show-ascii-art: false
           path-to-workflows: |-
             restore/action.yaml
             save/action.yaml

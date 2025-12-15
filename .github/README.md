@@ -4,11 +4,11 @@ uses [`nix nario`](https://determinate.systems/blog/changelog-determinate-nix-31
 
 chiefly for [nix-init](https://github.com/spotdemo4/nix-init)
 
-## requirements
+## Requirements
 
 [determinate-nix-action](https://github.com/DeterminateSystems/determinate-nix-action) or some other way of getting `nix nario`
 
-## usage
+## Usage
 
 ```yaml
 - uses: spotdemo4/nix-nario-action/restore@v0.0.1
@@ -26,7 +26,7 @@ chiefly for [nix-init](https://github.com/spotdemo4/nix-init)
     path: nixpkgs#attic-client
 ```
 
-## inputs
+## Inputs
 
 ### `name`
 
@@ -36,7 +36,7 @@ the name of the cache
 
 the path to save/restore, defaults to the entire nix store
 
-## outputs
+## Outputs
 
 ### `cache-hit` (restore)
 
