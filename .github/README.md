@@ -1,5 +1,7 @@
 # nix nario action
 
+![check](https://github.com/spotdemo4/nix-nario-action/actions/workflows/check.yaml/badge.svg?branch=main)
+
 uses [`nix nario`](https://determinate.systems/blog/changelog-determinate-nix-3120/) to save & restore the nix store to the actions cache
 
 chiefly for [nix-init](https://github.com/spotdemo4/nix-init)
