@@ -1,0 +1,32 @@
+name: check
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Validate actions
+        uses: jazzsequence/github-action-validator@8dce06e551e2b2a09f6e8c72e76fa4b60da5c8f1 # v1.0.1
+        with:
+          path-to-workflows: |-
+            restore/action.yaml
+            save/action.yaml
+            .github/workflows/bump.yaml
+            .github/workflows/check.yaml
+            .github/workflows/release.yaml
+            .github/workflows/update.yaml

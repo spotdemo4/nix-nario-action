@@ -1,0 +1,43 @@
+# nix nario action
+
+uses [`nix nario`](https://determinate.systems/blog/changelog-determinate-nix-3120/) to save & restore the nix store to the actions cache
+
+chiefly for [nix-init](https://github.com/spotdemo4/nix-init)
+
+## requirements
+
+[determinate-nix-action](https://github.com/DeterminateSystems/determinate-nix-action) or some other way of getting `nix nario`
+
+## usage
+
+```yaml
+- uses: spotdemo4/nix-nario-action/restore@v0.0.1
+  id: attic-cache
+  with:
+    name: attic
+    path: nixpkgs#attic-client
+
+# ...
+
+- if: ${{ steps.attic-cache.outputs.cache-hit != 'true' }}
+  uses: spotdemo4/nix-nario-action/save@v0.0.1
+  with:
+    name: attic
+    path: nixpkgs#attic-client
+```
+
+## inputs
+
+### `name`
+
+the name of the cache
+
+### `path`
+
+the path to save/restore, defaults to the entire nix store
+
+## outputs
+
+### `cache-hit` (restore)
+
+whether there was a cache hit

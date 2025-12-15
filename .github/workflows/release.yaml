@@ -1,0 +1,20 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: release
+
+permissions:
+  contents: write
+
+jobs:
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
+        with:
+          generate_release_notes: true

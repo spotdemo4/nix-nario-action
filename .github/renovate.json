@@ -1,0 +1,29 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-global-schema.json",
+
+  // self-hosted
+  "onboarding": false,
+  "requireConfig": "ignored",
+  "platform": "github",
+  "repositories": ["spotdemo4/nix-nario-action"],
+
+  // repository
+  "extends": ["config:recommended"],
+  "branchPrefix": "renovate/",
+  "dependencyDashboardTitle": "Dependency Dashboard",
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "groupName": "github actions",
+      "matchFileNames": [".github/workflows/*.yaml"],
+      "matchManagers": ["github-actions"]
+    },
+    {
+      "commitMessagePrefix": "feat: ",
+      "matchFileNames": ["**/action.yaml"]
+    }
+  ]
+}
