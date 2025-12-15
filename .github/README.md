@@ -4,7 +4,7 @@
 
 uses [`nix nario`](https://determinate.systems/blog/changelog-determinate-nix-3120/) to save & restore the nix store to the actions cache
 
-chiefly for [nix-init](https://github.com/spotdemo4/nix-init)
+chiefly for [`spotdemo4/nix-init`](https://github.com/spotdemo4/nix-init)
 
 ## Requirements
 
