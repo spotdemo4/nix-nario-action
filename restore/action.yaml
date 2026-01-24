@@ -2,9 +2,6 @@ name: nix nario restore
 description: Restore the nix store to the actions cache using nix nario
 
 inputs:
-  name:
-    description: "name of the cache"
-    required: true
   path:
     description: "nix path to save to the cache"
     required: false
@@ -18,27 +15,36 @@ runs:
   using: "composite"
   steps:
     - id: pkg
-      if: ${{ inputs.path != '' }}
       shell: bash
       run: |
-        path=$(nix eval --inputs-from . --raw "${{ inputs.path }}")
+        if [[ -n "${{ inputs.path }}" ]]; then
+          path=$(nix eval --inputs-from . --raw "${{ inputs.path }}")
 
-        if nix store ls "${path}" &> /dev/null; then
-          echo "Package already in store, skipping restore."
-          echo "exists=true" >> $GITHUB_OUTPUT
+          if nix store ls "${path}" &> /dev/null; then
+            echo "Package already in store, skipping restore."
+            echo "exists=true" >> $GITHUB_OUTPUT
+            return 0
+          fi
+
+          file=$(basename "${path}")
+          hash="${file%%-*}"
+          name="${file#*-}"
         else
-          name=$(basename "${path}")
-          hash="${name%%-*}"
-          echo "hash=${hash}" >> $GITHUB_OUTPUT
+          hash="${{ hashFiles('**/flake.lock') }}"
+          name="flake"
         fi
+
+        echo "hash=${hash}" >> $GITHUB_OUTPUT
+        echo "name=${name}" >> $GITHUB_OUTPUT
 
     - id: cache
       if: ${{ steps.pkg.outputs.exists != 'true' }}
       uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       with:
-        path: "${{ runner.temp }}/${{ inputs.name }}.nario"
-        key: "nix-init-${{ inputs.name }}-${{ steps.pkg.outputs.hash || hashFiles('**/flake.lock') }}"
+        path: "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
+        key: "nix-${{ steps.pkg.outputs.hash }}"
 
     - if: ${{ steps.cache.outputs.cache-hit == 'true' }}
       shell: bash
-      run: nix nario import --no-check-sigs < "${{ runner.temp }}/${{ inputs.name }}.nario"
+      run: |
+        nix nario import --no-check-sigs < "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"

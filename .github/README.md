@@ -16,7 +16,6 @@ chiefly for [`spotdemo4/nix-init`](https://github.com/spotdemo4/nix-init)
 - uses: spotdemo4/nix-nario-action/restore@v0.4.0
   id: attic-cache
   with:
-    name: attic
     path: nixpkgs#attic-client
 
 # ...
@@ -24,15 +23,10 @@ chiefly for [`spotdemo4/nix-init`](https://github.com/spotdemo4/nix-init)
 - if: ${{ steps.attic-cache.outputs.cache-hit != 'true' }}
   uses: spotdemo4/nix-nario-action/save@v0.4.0
   with:
-    name: attic
     path: nixpkgs#attic-client
 ```
 
 ## Inputs
-
-### `name`
-
-the name of the cache
 
 ### `path`
 

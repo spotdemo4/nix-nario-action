@@ -2,9 +2,6 @@ name: nix nario save
 description: Save the nix store to the actions cache using nix nario
 
 inputs:
-  name:
-    description: "name of the cache"
-    required: true
   path:
     description: "nix path to save to the cache"
     required: false
@@ -12,26 +9,34 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - if: ${{ inputs.path == '' }}
+    - id: pkg
       shell: bash
-      run: nix nario export --format 2 --all > "${{ runner.temp }}/${{ inputs.name }}.nario"
+      run: |
+        if [[ -n "${{ inputs.path }}" ]]; then
+          path=$(nix eval --inputs-from . --raw "${{ inputs.path }}")
+          file=$(basename "${path}")
+          hash="${file%%-*}"
+          name="${file#*-}"
+        else
+          hash="${{ hashFiles('**/flake.lock') }}"
+          name="flake"
+        fi
+
+        echo "hash=${hash}" >> $GITHUB_OUTPUT
+        echo "name=${name}" >> $GITHUB_OUTPUT
 
     - if: ${{ inputs.path != '' }}
       shell: bash
       run: |
         nix build --inputs-from . "${{ inputs.path }}"
-        nix nario export --format 2 --inputs-from . -r "${{ inputs.path }}" > "${{ runner.temp }}/${{ inputs.name }}.nario"
+        nix nario export --format 2 --inputs-from . -r "${{ inputs.path }}" > "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
 
-    - id: pkg
-      if: ${{ inputs.path != '' }}
+    - if: ${{ inputs.path == '' }}
       shell: bash
       run: |
-        path=$(nix eval --inputs-from . --raw "${{ inputs.path }}")
-        name=$(basename "${path}")
-        hash="${name%%-*}"
-        echo "hash=${hash}" >> $GITHUB_OUTPUT
+        nix nario export --format 2 --all > "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
 
     - uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       with:
-        path: "${{ runner.temp }}/${{ inputs.name }}.nario"
-        key: "nix-init-${{ inputs.name }}-${{ steps.pkg.outputs.hash || hashFiles('**/flake.lock') }}"
+        path: "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
+        key: "nix-${{ steps.pkg.outputs.hash }}"
