@@ -5,7 +5,6 @@ inputs:
   name:
     description: "name of the cache"
     required: true
-
   path:
     description: "nix path to save to the cache"
     required: false
@@ -23,16 +22,16 @@ runs:
         nix build --inputs-from . "${{ inputs.path }}"
         nix nario export --format 2 --inputs-from . -r "${{ inputs.path }}" > "${{ runner.temp }}/${{ inputs.name }}.nario"
 
-    - if: ${{ inputs.path != '' }}
+    - id: pkg
+      if: ${{ inputs.path != '' }}
       shell: bash
-      id: hash
       run: |
         path=$(nix eval --inputs-from . --raw "${{ inputs.path }}")
-        package=$(basename "$path")
-        hash="${package%%-*}"
+        name=$(basename "${path}")
+        hash="${name%%-*}"
         echo "hash=${hash}" >> $GITHUB_OUTPUT
 
     - uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       with:
         path: "${{ runner.temp }}/${{ inputs.name }}.nario"
-        key: "nix-init-${{ inputs.name }}-${{ steps.hash.outputs.hash || hashFiles('**/flake.lock') }}"
+        key: "nix-init-${{ inputs.name }}-${{ steps.pkg.outputs.hash || hashFiles('**/flake.lock') }}"

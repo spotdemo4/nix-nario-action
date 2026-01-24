@@ -9,8 +9,6 @@
 
   // repository
   "extends": ["config:recommended"],
-  "branchPrefix": "renovate/",
-  "dependencyDashboardTitle": "Dependency Dashboard",
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
