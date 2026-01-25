@@ -42,7 +42,8 @@ runs:
     - if: ${{ inputs.path == '' }}
       shell: bash
       run: |
-        nix nario export --format 2 --all > "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
+        readarray -t inputs < <(nix flake archive --json | jq -r '.inputs.[].path')
+        nix nario export --format 2 --inputs-from . -r "${inputs[@]}" > "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
 
     - uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       with:
