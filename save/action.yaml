@@ -20,13 +20,13 @@ runs:
           file=$(basename "${path}")
 
           hash="${file%%-*}"
-          version=$(nix eval --inputs-from . --raw "${{ inputs.path }}.version" 2> /dev/null || echo "0")
+          version=$(nix eval --inputs-from . --raw "${{ inputs.path }}.version" 2> /dev/null || echo "null")
           name=$(nix eval --inputs-from . --raw "${{ inputs.path }}.pname" 2> /dev/null || nix eval --inputs-from . --raw "${{ inputs.path }}.name")
 
         else
 
           hash=$(nix flake metadata --json | jq -r '.locked.rev')
-          version="0"
+          version="null"
           name="flake"
 
         fi
