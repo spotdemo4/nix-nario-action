@@ -19,21 +19,26 @@ runs:
           path=$(nix eval --inputs-from . --raw "${{ inputs.path }}")
           file=$(basename "${path}")
 
-          hash="${file%%-*}"
-          version=$(nix eval --inputs-from . --raw "${{ inputs.path }}.version" 2> /dev/null || echo "null")
           name=$(nix eval --inputs-from . --raw "${{ inputs.path }}.pname" 2> /dev/null || nix eval --inputs-from . --raw "${{ inputs.path }}.name")
+          version=$(nix eval --inputs-from . --raw "${{ inputs.path }}.version" 2> /dev/null || echo "")
+          hash="${file%%-*}"
 
         else
 
-          hash="${{ hashFiles('**/flake.lock') }}"
-          version="null"
           name="flake"
+          hash="${{ hashFiles('**/flake.lock') }}"
 
         fi
 
-        echo "hash=${hash}" >> $GITHUB_OUTPUT
-        echo "version=${version}" >> $GITHUB_OUTPUT
         echo "name=${name}" >> $GITHUB_OUTPUT
+        echo "version=${version}" >> $GITHUB_OUTPUT
+        echo "hash=${hash}" >> $GITHUB_OUTPUT
+
+        if [[ -n "${version}" ]]; then
+          echo "key=nix-${name}-${version}-${hash}" >> $GITHUB_OUTPUT
+        else
+          echo "key=nix-${name}-${hash}" >> $GITHUB_OUTPUT
+        fi
 
     - if: ${{ inputs.path != '' }}
       shell: bash
@@ -58,7 +63,7 @@ runs:
     - uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       with:
         path: "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
-        key: "nix-${{ steps.pkg.outputs.name }}-${{ steps.pkg.outputs.version }}-${{ steps.pkg.outputs.hash }}"
+        key: "${{ steps.pkg.outputs.key }}"
 
     - shell: bash
       run: |
