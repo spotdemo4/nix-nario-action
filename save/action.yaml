@@ -25,7 +25,7 @@ runs:
 
         else
 
-          hash=$(nix flake metadata --json | jq -r .locked.rev)
+          hash=$(nix flake metadata --json | jq -r '.locked.rev')
           version="0"
           name="flake"
 
