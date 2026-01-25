@@ -17,6 +17,8 @@ runs:
     - id: pkg
       shell: bash
       run: |
+        # Determine hash, version, and name
+
         if [[ -n "${{ inputs.path }}" ]]; then
 
           if nix store ls "$(nix eval --inputs-from . --raw "${{ inputs.path }}")" &> /dev/null; then
@@ -63,5 +65,7 @@ runs:
     - if: ${{ steps.cache.outputs.cache-hit != '' }}
       shell: bash
       run: |
+        # Import and clean up
+
         nix nario import --no-check-sigs < "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
         rm -f "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
