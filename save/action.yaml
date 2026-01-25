@@ -24,7 +24,7 @@ runs:
         else
 
           hash=$(nix flake metadata --json | jq -r .locked.rev)
-          version=$(nix flake metadata --json | jq -r .locked.revCount)
+          version="0"
           name="flake"
 
         fi
@@ -42,7 +42,11 @@ runs:
     - if: ${{ inputs.path == '' }}
       shell: bash
       run: |
-        readarray -t inputs < <(nix flake archive --json | jq -r '.inputs.[].path')
+        inputs=()
+        while IFS=$'\n' read -r input; do
+            inputs+=("${input}")
+        done < <(nix flake archive --json | jq -r '.inputs.[].path')
+
         nix nario export --format 2 --inputs-from . -r "${inputs[@]}" > "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
 
     - uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2

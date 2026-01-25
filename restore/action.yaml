@@ -41,7 +41,7 @@ runs:
           fi
 
           hash=$(nix flake metadata --json | jq -r .locked.rev)
-          version=$(nix flake metadata --json | jq -r .locked.revCount)
+          version="0"
           name="flake"
 
         fi
