@@ -13,16 +13,24 @@ runs:
       shell: bash
       run: |
         if [[ -n "${{ inputs.path }}" ]]; then
-          path=$(nix eval --inputs-from . --raw "${{ inputs.path }}")
-          file=$(basename "${path}")
-          hash="${file%%-*}"
-          name="${file#*-}"
+
+          info=$(nix path-info --json --json-format 2 --inputs-from . "${{ inputs.path }}")
+          sha256=$(echo "${info}" | jq -r '.info | to_entries | first | .value.narHash')
+
+          hash=$(nix hash convert --to base64 "${sha256}")
+          version=$(nix eval --raw "${{ inputs.path }}.version" 2> /dev/null || echo "0")
+          name=$(nix eval --raw "${{ inputs.path }}.pname" 2> /dev/null || nix eval --raw "${{ inputs.path }}.name")
+
         else
-          hash="${{ hashFiles('**/flake.lock') }}"
+
+          hash=$(nix flake metadata --json | jq -r .locked.rev)
+          version=$(nix flake metadata --json | jq -r .locked.revCount)
           name="flake"
+
         fi
 
         echo "hash=${hash}" >> $GITHUB_OUTPUT
+        echo "version=${version}" >> $GITHUB_OUTPUT
         echo "name=${name}" >> $GITHUB_OUTPUT
 
     - if: ${{ inputs.path != '' }}
@@ -39,4 +47,8 @@ runs:
     - uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
       with:
         path: "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
-        key: "nix-${{ steps.pkg.outputs.hash }}"
+        key: "nix-${{ steps.pkg.outputs.name }}-${{ steps.pkg.outputs.version }}-${{ steps.pkg.outputs.hash }}"
+
+    - shell: bash
+      run: |
+        rm -f "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
