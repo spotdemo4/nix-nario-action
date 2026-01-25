@@ -25,7 +25,7 @@ runs:
 
         else
 
-          hash=$(nix flake metadata --json | jq -r '.locked.rev')
+          hash="${{ hashFiles('**/flake.lock') }}"
           version="null"
           name="flake"
 
