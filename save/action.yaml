@@ -16,10 +16,10 @@ runs:
 
         if [[ -n "${{ inputs.path }}" ]]; then
 
-          info=$(nix path-info --json --json-format 2 --inputs-from . "${{ inputs.path }}")
-          sha256=$(echo "${info}" | jq -r '.info | to_entries | first | .value.narHash')
+          path=$(nix eval --inputs-from . --raw "${{ inputs.path }}")
+          file=$(basename "${path}")
 
-          hash=$(nix hash convert --to base64 "${sha256}")
+          hash="${file%%-*}"
           version=$(nix eval --inputs-from . --raw "${{ inputs.path }}.version" 2> /dev/null || echo "0")
           name=$(nix eval --inputs-from . --raw "${{ inputs.path }}.pname" 2> /dev/null || nix eval --inputs-from . --raw "${{ inputs.path }}.name")
 
