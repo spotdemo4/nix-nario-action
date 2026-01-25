@@ -18,8 +18,8 @@ runs:
           sha256=$(echo "${info}" | jq -r '.info | to_entries | first | .value.narHash')
 
           hash=$(nix hash convert --to base64 "${sha256}")
-          version=$(nix eval --raw "${{ inputs.path }}.version" 2> /dev/null || echo "0")
-          name=$(nix eval --raw "${{ inputs.path }}.pname" 2> /dev/null || nix eval --raw "${{ inputs.path }}.name")
+          version=$(nix eval --inputs-from . --raw "${{ inputs.path }}.version" 2> /dev/null || echo "0")
+          name=$(nix eval --inputs-from . --raw "${{ inputs.path }}.pname" 2> /dev/null || nix eval --inputs-from . --raw "${{ inputs.path }}.name")
 
         else
 
