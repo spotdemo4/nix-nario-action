@@ -49,12 +49,13 @@ runs:
         fi
 
         echo "name=${name}" >> $GITHUB_OUTPUT
-        echo "version=${version}" >> $GITHUB_OUTPUT
         echo "hash=${hash}" >> $GITHUB_OUTPUT
 
         if [[ -n "${version}" ]]; then
+          echo "version=${version}" >> $GITHUB_OUTPUT
           echo "key=nix-${name}-${version}-${hash}" >> $GITHUB_OUTPUT
         else
+          echo "version=0.0.0" >> $GITHUB_OUTPUT
           echo "key=nix-${name}-${hash}" >> $GITHUB_OUTPUT
         fi
 
