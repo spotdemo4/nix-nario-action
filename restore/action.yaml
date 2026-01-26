@@ -26,7 +26,7 @@ runs:
           if nix store ls "${path}" &> /dev/null; then
             echo "Package already in store, skipping restore."
             echo "exists=true" >> $GITHUB_OUTPUT
-            return 0
+            exit 0
           fi
 
           file=$(basename "${path}")
@@ -40,7 +40,7 @@ runs:
           if nix store ls "$(nix flake archive --json --dry-run 2> /dev/null | jq -r '.path')" &> /dev/null; then
             echo "Flake already in store, skipping restore."
             echo "exists=true" >> $GITHUB_OUTPUT
-            return 0
+            exit 0
           fi
 
           name="flake"
