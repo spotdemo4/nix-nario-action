@@ -12,7 +12,7 @@ runs:
     - id: pkg
       shell: bash
       run: |
-        # Determine hash, version, and name
+        # Determining name, version and hash
 
         if [[ -n "${{ inputs.path }}" ]]; then
 
@@ -30,13 +30,18 @@ runs:
 
         fi
 
+        echo "name: ${name}"
         echo "name=${name}" >> $GITHUB_OUTPUT
+
+        echo "hash: ${hash}"
         echo "hash=${hash}" >> $GITHUB_OUTPUT
 
         if [[ -n "${version}" ]]; then
+          echo "version: ${version}"
           echo "version=${version}" >> $GITHUB_OUTPUT
           echo "key=nix-${name}-${version}-${hash}" >> $GITHUB_OUTPUT
         else
+          echo "version: n/a"
           echo "version=0.0.0" >> $GITHUB_OUTPUT
           echo "key=nix-${name}-${hash}" >> $GITHUB_OUTPUT
         fi
@@ -44,7 +49,7 @@ runs:
     - if: ${{ inputs.path != '' }}
       shell: bash
       run: |
-        # Build and export the package
+        # Building and exporting ${{ steps.pkg.outputs.name }} (${{ inputs.path }})
 
         nix build --inputs-from . "${{ inputs.path }}"
         nix nario export --format 2 --inputs-from . -r "${{ inputs.path }}" > "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
@@ -52,7 +57,7 @@ runs:
     - if: ${{ inputs.path == '' }}
       shell: bash
       run: |
-        # Build and export the flake
+        # Exporting flake inputs
 
         inputs=()
         while IFS=$'\n' read -r input; do
@@ -68,6 +73,6 @@ runs:
 
     - shell: bash
       run: |
-        # Clean up
+        # Cleaning up ${{ steps.pkg.outputs.name }}
 
         rm -f "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
