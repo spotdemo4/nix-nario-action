@@ -66,7 +66,7 @@ runs:
 
         nix nario export --format 2 --inputs-from . -r "${inputs[@]}" > "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
 
-    - uses: actions/cache/save@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+    - uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
         path: "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
         key: "${{ steps.pkg.outputs.key }}"
