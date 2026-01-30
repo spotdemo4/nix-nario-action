@@ -9,6 +9,19 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - id: env
+      shell: bash
+      run: |
+        # Setup env
+
+        TMPNIX="/nix/_tmp"
+        if sudo mkdir -p "${TMPNIX}"; then
+          sudo chmod 1777 "${TMPNIX}"
+          echo "tmp=${TMPNIX}" >> $GITHUB_OUTPUT
+        else
+          echo "tmp=${{ runner.temp }}" >> $GITHUB_OUTPUT
+        fi
+
     - id: pkg
       shell: bash
       run: |
@@ -52,7 +65,7 @@ runs:
         # Building and exporting ${{ steps.pkg.outputs.name }} (${{ inputs.path }})
 
         nix build --inputs-from . "${{ inputs.path }}"
-        nix nario export --format 2 --inputs-from . -r "${{ inputs.path }}" > "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
+        nix nario export --format 2 --inputs-from . -r "${{ inputs.path }}" > "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"
 
     - if: ${{ inputs.path == '' }}
       shell: bash
@@ -64,15 +77,15 @@ runs:
             inputs+=("${input}")
         done < <(nix flake archive --json | jq -r '.inputs.[].path')
 
-        nix nario export --format 2 --inputs-from . -r "${inputs[@]}" > "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
+        nix nario export --format 2 --inputs-from . -r "${inputs[@]}" > "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"
 
     - uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
-        path: "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
+        path: "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"
         key: "${{ steps.pkg.outputs.key }}"
 
     - shell: bash
       run: |
         # Cleaning up ${{ steps.pkg.outputs.name }}
 
-        rm -f "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
+        rm -f "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"

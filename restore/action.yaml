@@ -14,6 +14,19 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - id: env
+      shell: bash
+      run: |
+        # Setup env
+
+        TMPNIX="/nix/_tmp"
+        if sudo mkdir -p "${TMPNIX}"; then
+          sudo chmod 1777 "${TMPNIX}"
+          echo "tmp=${TMPNIX}" >> $GITHUB_OUTPUT
+        else
+          echo "tmp=${{ runner.temp }}" >> $GITHUB_OUTPUT
+        fi
+
     - id: pkg
       shell: bash
       run: |
@@ -68,7 +81,7 @@ runs:
       if: ${{ steps.pkg.outputs.exists != 'true' }}
       uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
-        path: "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
+        path: "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"
         key: "${{ steps.pkg.outputs.key }}"
         restore-keys: |
           nix-${{ steps.pkg.outputs.name }}-${{ steps.pkg.outputs.version }}
@@ -80,5 +93,5 @@ runs:
       run: |
         # Importing ${{ steps.pkg.outputs.name }} from cache
 
-        nix nario import --no-check-sigs < "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
-        rm -f "${{ runner.temp }}/${{ steps.pkg.outputs.name }}.nario"
+        nix nario import --no-check-sigs < "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"
+        rm -f "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"
