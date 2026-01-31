@@ -23,6 +23,7 @@ runs:
         if sudo mkdir -p "${TMPNIX}"; then
           sudo chmod 1777 "${TMPNIX}"
           echo "RUNNER_TEMP=${TMPNIX}" >> $GITHUB_ENV
+          echo "GITHUB_WORKSPACE=${TMPNIX}" >> $GITHUB_ENV
           echo "tmp=${TMPNIX}" >> $GITHUB_OUTPUT
         else
           TMPNIX="${{ runner.temp }}/nix-nario-tmp"
@@ -99,3 +100,4 @@ runs:
         nix nario import --no-check-sigs < "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"
         sudo rm -rf "${{ steps.env.outputs.tmp }}"
         echo "RUNNER_TEMP=${{ runner.temp }}" >> $GITHUB_ENV
+        echo "GITHUB_WORKSPACE=${{ github.workspace }}" >> $GITHUB_ENV
