@@ -97,5 +97,5 @@ runs:
         # Importing ${{ steps.pkg.outputs.name }} from cache
 
         nix nario import --no-check-sigs < "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"
-        rm -rf "${{ steps.env.outputs.tmp }}"
+        sudo rm -rf "${{ steps.env.outputs.tmp }}"
         echo "RUNNER_TEMP=${{ runner.temp }}" >> $GITHUB_ENV

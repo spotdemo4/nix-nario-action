@@ -91,5 +91,5 @@ runs:
       run: |
         # Cleaning up ${{ steps.pkg.outputs.name }}
 
-        rm -rf "${{ steps.env.outputs.tmp }}"
+        sudo rm -rf "${{ steps.env.outputs.tmp }}"
         echo "RUNNER_TEMP=${{ runner.temp }}" >> $GITHUB_ENV
