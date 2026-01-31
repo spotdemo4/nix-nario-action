@@ -22,9 +22,12 @@ runs:
         TMPNIX="/nix/_tmp"
         if sudo mkdir -p "${TMPNIX}"; then
           sudo chmod 1777 "${TMPNIX}"
+          echo "RUNNER_TEMP=${TMPNIX}" >> $GITHUB_ENV
           echo "tmp=${TMPNIX}" >> $GITHUB_OUTPUT
         else
-          echo "tmp=${{ runner.temp }}" >> $GITHUB_OUTPUT
+          TMPNIX="${{ runner.temp }}/nix-nario-tmp"
+          mkdir -p "${TMPNIX}"
+          echo "tmp=${TMPNIX}" >> $GITHUB_OUTPUT
         fi
 
     - id: pkg
@@ -94,4 +97,5 @@ runs:
         # Importing ${{ steps.pkg.outputs.name }} from cache
 
         nix nario import --no-check-sigs < "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"
-        rm -f "${{ steps.env.outputs.tmp }}/${{ steps.pkg.outputs.name }}.nario"
+        rm -rf "${{ steps.env.outputs.tmp }}"
+        echo "RUNNER_TEMP=${{ runner.temp }}" >> $GITHUB_ENV
